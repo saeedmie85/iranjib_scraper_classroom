@@ -2,6 +2,7 @@
 from playwright.sync_api import sync_playwright
 from page_scraper import scrap_page
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
 
 def main():
     with sync_playwright() as p:
@@ -65,5 +66,7 @@ def scrape_multithreaded(urls, workers=5):
 if __name__ == "__main__":
     urls = main()
     print("Total URLs:", len(urls))
-
-    scrape_multithreaded(urls, workers=5)
+    t1 = time.time()
+    scrape_multithreaded(urls, workers=50)
+    t2 = time.time()
+    print('Duration:',t2 - t1)
