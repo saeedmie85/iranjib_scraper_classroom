@@ -1,6 +1,7 @@
 # https://www.geeksforgeeks.org/web-scraping/how-to-scrape-the-web-with-playwright-in-python/
 from playwright.sync_api import sync_playwright
 from page_scraper import scrap_page
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def main():
     with sync_playwright() as p:
@@ -50,8 +51,19 @@ def main():
         browser.close()
     return urls
 
+def scrape_multithreaded(urls, workers=5):
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        futures = [executor.submit(scrap_page, url) for url in urls]
+
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                print("Error:", e)
+
+
 if __name__ == "__main__":
     urls = main()
-    print(len(urls))
-    for url in urls:
-        scrap_page(url)
+    print("Total URLs:", len(urls))
+
+    scrape_multithreaded(urls, workers=5)
